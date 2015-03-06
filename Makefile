@@ -6,7 +6,7 @@ CXXFLAGS=-c -Wall -I$(INCDIR)
 #HEADERS = definitions.h parser.h
 LDFLAGS=
 EXECUTABLE=lispInt
-SRCS=lispInt.cpp parser.cpp
+SRCS=lispInt.cpp parser.cpp expressions.cpp
 OBJS=$(SRCS:.cpp=.o)
 RM = rm 
 # end

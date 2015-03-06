@@ -1,6 +1,9 @@
 #ifndef EXPRESSIONS_H
 #define EXPRESSIONS_H
 
+#include "definitions.h"
+
+#if 0
 struct node
 {
 	node()
@@ -13,22 +16,29 @@ struct node
 	node * left;
 	node * right;
 }
+#endif
 
-class sExpressions
+typedef enum expType{ATOMIC_NUMBER, ATOMIC_ID, NON_ATOMIC}ExpressionType;
+
+class sExpression
 {
 public:
-	sExpressions();
-	~sExpressions();
-	void insert(int id);
-	void insert(node * head);
-	
+	sExpression();
+	sExpression(ExpressionType eType);
+	~sExpression();
+	bool insert(sExpression * leaf);
+	//void insert(node * head);
+	//void traverse();
+	//void destroy();	
 	
 
 private:
-
-	
-
-}
+	ExpressionType type;
+	string s;
+	int id;
+	sExpression * left;
+	sExpression * right;
+};
 
 
 #endif

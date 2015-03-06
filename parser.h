@@ -2,6 +2,8 @@
 #define PARSER_H
 
 #include "definitions.h"
+#include "expressions.h"
+
 
 // errorCodes
 // 0 no error
@@ -37,6 +39,7 @@ private:
 	string generateExpression();
 	int checkToken(char ch);
 	string pruneString(string expression);
+	sExpression * expTree;
 };
 
 #endif
