@@ -40,13 +40,20 @@ sExpression * sExpression::initLeaf()
 {
 	if(this->left == NULL)
 	{
+		cout<<"\nLEFT\n";
 		this->left = new sExpression;
 		return this->left;
 	}
 	else if(this->right == NULL)
 	{
+		cout<<"\nRIGHT\n";
 		this->right = new sExpression;
 		return this->right;
 	}
 	return NULL;
+}
+
+void sExpression::setString(string s)
+{
+	this->s = s;
 }

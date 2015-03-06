@@ -65,9 +65,9 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				#ifdef LOG
 				cout<<"\nrec1\n";
 				#endif
-				stringSoFar += cur;	
 				string subExpression = expression.substr(strPtr, (length-strPtr));
 				sExpression * child = parent->initLeaf();
+				child->setString(stringSoFar);
 				if(child == NULL)
 					cout<<"Something is wrong!!!\n";
 					
@@ -80,7 +80,7 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				else
 				{
 					strPtr += retPacket.offset;
-					stringSoFar += retPacket.s;
+					cout<<"ptr="<<strPtr<<endl;
 				}
 				break;
 			}
@@ -97,8 +97,10 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				}
 				else
 				{
-					stringSoFar += cur;
 					pointerSeen = true;
+					sExpression * child = parent->initLeaf();
+					child->setString(stringSoFar);
+					stringSoFar = "";
 				}
 				break;
 			}
@@ -115,15 +117,15 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				else
 				{
 				isList = true;
-				stringSoFar += ".(";
 				#ifdef LOG
 				cout<<"\nrec2\n";	
 				#endif
 				sExpression * child = parent->initLeaf();
+				sExpression * grandChild = child->initLeaf();
 				if(child == NULL)
 					cout<<"Something is Wrong!!\n!";
 				string subExpression = expression.substr(strPtr, (length-strPtr));
-				StringPacket retPacket = parseExpression(subExpression, isList, child);
+				StringPacket retPacket = parseExpression(subExpression, isList, grandChild);
 				if(retPacket.errorCode == 1)
 				{
 					outPacket.errorCode = 1;
@@ -132,8 +134,7 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				else
 				{
 					strPtr += retPacket.offset;
-					stringSoFar += retPacket.s;
-					stringSoFar += ".NIL)";
+					cout<<"ptr="<<strPtr<<endl;
 				}
 
 				}
@@ -141,8 +142,16 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 			}
 			case 4:
 			{	// closing paren - Need to handle improper use of this better!!
-				stringSoFar += cur;
 				outPacket.offset = strPtr;
+				sExpression * child = parent->initLeaf();
+				child->setString(stringSoFar);
+				if(isList)
+				{
+					cout<<"here\n";
+					sExpression * lastChild = parent->right->initLeaf();
+					lastChild->setString("NIL");
+					cout<<"not Here\n";
+				}
 				outPacket.s = stringSoFar;
 				return outPacket;	
 			}
@@ -166,7 +175,8 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 			}
 		}
 	if(strPtr >= length)
-	{
+	{	
+		outPacket.offset = strPtr;
 		outPacket.s = stringSoFar;
 		keepParsing = false;
 	}
@@ -202,7 +212,8 @@ int Parser::checkToken(char ch)
 		{
 			int chCode = (int)ch;
 			if((chCode >= 48 && chCode <= 57) ||
-				(chCode >= 65 && chCode <= 90) || (chCode >= 97 && chCode <=122))
+				(chCode >= 65 && chCode <= 90) || (chCode >= 97 && chCode <=122) ||
+				(chCode == 45))
 				return 0;
 			else	
 				return -1;

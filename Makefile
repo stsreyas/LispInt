@@ -2,7 +2,7 @@
 
 CXX=g++
 INCDIR = ./
-CXXFLAGS=-c -Wall -I$(INCDIR)
+CXXFLAGS=-c -g -Wall -I$(INCDIR)
 #HEADERS = definitions.h parser.h
 LDFLAGS=
 EXECUTABLE=lispInt

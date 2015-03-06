@@ -28,16 +28,18 @@ public:
 	~sExpression();
 	bool insert(sExpression * leaf);
 	sExpression * initLeaf();
+	void setString(string s);
+	//void setExpressionType(ExpressionType eType);
 	//void traverse();
 	//void destroy();	
 	
+	sExpression * left;
+	sExpression * right;
 
 private:
 	ExpressionType type;
 	string s;
 	int id;
-	sExpression * left;
-	sExpression * right;
 };
 
 
