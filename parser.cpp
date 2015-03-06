@@ -151,9 +151,10 @@ string Parser::pruneString(string expression)
 	string multSp = "  ";
 	while(loc != std::string::npos)
 	{
-		int len = pruned.length();
+		int len = pruned.size();
 		loc = pruned.find(multSp, startFrom);
-		pruned = pruned.substr(startFrom, loc-1) + " " + pruned.substr(loc+2, len);	
+		if(loc != std::string::npos)
+			pruned = pruned.substr(startFrom, loc) + " " + pruned.substr(loc+2, len);	
 	}
 	return pruned;
 }
