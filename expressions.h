@@ -27,7 +27,7 @@ public:
 	sExpression(ExpressionType eType);
 	~sExpression();
 	bool insert(sExpression * leaf);
-	//void insert(node * head);
+	sExpression * initLeaf();
 	//void traverse();
 	//void destroy();	
 	

@@ -18,7 +18,8 @@ string Parser::Parse(string expression)
 	if(inputString[0] == '(')
 	{
 		int len = inputString.length();
-		output = parseExpression(inputString.substr(1, len), false);
+		expTree = new sExpression;
+		output = parseExpression(inputString.substr(1, len), false, expTree);
 		if(output.errorCode == 0)
 			return inputString;
 		else
@@ -37,7 +38,7 @@ string Parser::Parse(string expression)
 // it will return on seeing a closing paren
 // at each call it will have a list of acceptable tokens it can see and if it sees something else
 // it will push out an error code and a null string.
-StringPacket Parser::parseExpression(string expression, bool listFlag)
+StringPacket Parser::parseExpression(string expression, bool listFlag, sExpression * parent)
 {
 	bool keepParsing = true;
 	string stringSoFar;
@@ -50,20 +51,27 @@ StringPacket Parser::parseExpression(string expression, bool listFlag)
 	StringPacket outPacket;
 	while(keepParsing)
 	{
-		int offset = 1;
 		char cur = expression[strPtr];
 		int tokenId = checkToken(cur);
+		#ifdef LOG
 		cout<<endl<<expression[strPtr]<<"="<<tokenId;
+		#endif
 		strPtr += 1;
 	
 		switch(tokenId)
 		{
 			case 1:
 			{	// opening paren
+				#ifdef LOG
 				cout<<"\nrec1\n";
+				#endif
 				stringSoFar += cur;	
 				string subExpression = expression.substr(strPtr, (length-strPtr));
-				StringPacket retPacket = parseExpression(subExpression, false);
+				sExpression * child = parent->initLeaf();
+				if(child == NULL)
+					cout<<"Something is wrong!!!\n";
+					
+				StringPacket retPacket = parseExpression(subExpression, false, child);
 				if(retPacket.errorCode == 1)
 				{
 					outPacket.errorCode = 1;
@@ -82,7 +90,9 @@ StringPacket Parser::parseExpression(string expression, bool listFlag)
 					|| (isList == true))
 				{
 					outPacket.errorCode = 1;
+					#ifdef LOG
 					cout<<"\nerr1\n";
+					#endif
 					return outPacket;
 				}
 				else
@@ -97,16 +107,23 @@ StringPacket Parser::parseExpression(string expression, bool listFlag)
 				if(pointerSeen == true)
 				{
 					outPacket.errorCode = 1;
+					#ifdef LOG
 					cout<<"\nerr2\n";
+					#endif
 					return outPacket;	
 				}
 				else
 				{
 				isList = true;
 				stringSoFar += ".(";
+				#ifdef LOG
 				cout<<"\nrec2\n";	
+				#endif
+				sExpression * child = parent->initLeaf();
+				if(child == NULL)
+					cout<<"Something is Wrong!!\n!";
 				string subExpression = expression.substr(strPtr, (length-strPtr));
-				StringPacket retPacket = parseExpression(subExpression, isList);
+				StringPacket retPacket = parseExpression(subExpression, isList, child);
 				if(retPacket.errorCode == 1)
 				{
 					outPacket.errorCode = 1;

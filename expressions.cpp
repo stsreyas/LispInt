@@ -35,3 +35,18 @@ bool sExpression::insert(sExpression * leaf)
 	else
 		return false;
 }
+
+sExpression * sExpression::initLeaf()
+{
+	if(this->left == NULL)
+	{
+		this->left = new sExpression;
+		return this->left;
+	}
+	else if(this->right == NULL)
+	{
+		this->right = new sExpression;
+		return this->right;
+	}
+	return NULL;
+}

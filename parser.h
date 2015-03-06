@@ -4,6 +4,7 @@
 #include "definitions.h"
 #include "expressions.h"
 
+#define LOG
 
 // errorCodes
 // 0 no error
@@ -35,7 +36,7 @@ public:
 private:
 
 	string inputString, outputString;
-	StringPacket parseExpression(string expression, bool listFlag);
+	StringPacket parseExpression(string expression, bool listFlag, sExpression * parent);
 	string generateExpression();
 	int checkToken(char ch);
 	string pruneString(string expression);
