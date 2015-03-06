@@ -7,6 +7,7 @@ using namespace std;
 
 typedef enum validTokens{INVALID, BRACE_OPEN, BRACE_CLOSED, COMMA, WHITESPACE, POINTER, INTEGER, IDENTIFIER} ValidTokens;
 
+#if 0
 class Token
 {
 public:
@@ -20,7 +21,7 @@ private:
 		
 
 }
-
+#endif
 typedef struct Token
 {
 	ValidTokens tokenId;

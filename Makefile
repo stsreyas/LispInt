@@ -1,20 +1,23 @@
 # Variable Declarations
 
-CXX = g++
+CXX=g++
 INCDIR = ./
-CXXFLAGS = -g -I$(INCDIR)
-HEADERS = definitions.h
-LDFLAGS = 
-PROG = lispInt
-SRCS = lispInt.cpp
-OBJS = lispInt.o
+CXXFLAGS=-c -Wall -I$(INCDIR)
+#HEADERS = definitions.h parser.h
+LDFLAGS=
+EXECUTABLE=lispInt
+SRCS=lispInt.cpp parser.cpp
+OBJS=$(SRCS:.cpp=.o)
 RM = rm 
 # end
 
-all:$(PROG)
+all:$(SRCS) $(EXECUTABLE)
 
-$(PROG):$(OBJS)
-	$(CXX) $(CFLAGS) $(HEADERS) $(SRCS) -o $(OBJS) 
+$(EXECUTABLE): $(OBJS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o $@ 
 
-clean: $(OBJS)
-	rm -rf $(OBJS) $(PROG)
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+clean:
+	rm -rf $(OBJS) $(EXECUTABLE)

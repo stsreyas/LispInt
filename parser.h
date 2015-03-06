@@ -3,32 +3,40 @@
 
 #include "definitions.h"
 
-typedef struct specialString
+// errorCodes
+// 0 no error
+// 1 unexpected token
+
+typedef struct stringPacket
 {	
-	specialString()
+	#if 0
+	stringPacket()
 	{
 		isValid = false;
-		errorCode = -1;		
+		errorCode = 0;		
+		offset = 0;
 	}
+	#endif
 	bool isValid;
 	string s;
 	int errorCode;
-}str;
+	int offset;
+}StringPacket;
 
-class parser
+class Parser
 {
 public:
-	parser();
-	~parser();
+	Parser();
+	~Parser();
 	
-	string parseExpression(string expression);
-	string generateExpression();
+	string Parse(string expression);
 private:
 
 	string inputString, outputString;
-	
-
-
+	StringPacket parseExpression(string expression);
+	string generateExpression();
+	int checkToken(char ch);
+	string pruneString(string expression);
 };
 
 #endif
