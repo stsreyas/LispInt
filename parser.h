@@ -9,7 +9,7 @@
 
 typedef struct stringPacket
 {	
-	#if 0
+	#if 1
 	stringPacket()
 	{
 		isValid = false;

@@ -156,5 +156,52 @@ string Parser::pruneString(string expression)
 		if(loc != std::string::npos)
 			pruned = pruned.substr(startFrom, loc) + " " + pruned.substr(loc+2, len);	
 	}
+	
+	// prune remaining spaces
+	startFrom = 0;
+	loc = 0;
+	string spDot = " .";
+	while(loc != std::string::npos)
+	{
+		int len = pruned.size();
+		loc = pruned.find(spDot, startFrom);
+		if(loc != std::string::npos)
+			pruned = pruned.substr(startFrom, loc) + "." + pruned.substr(loc+2, len);
+	}
+	
+	startFrom = 0;
+	loc = 0;
+	string dotSp = ". ";
+	while(loc != std::string::npos)
+	{
+		int len = pruned.size();
+		loc = pruned.find(dotSp, startFrom);
+		if(loc != std::string::npos)
+			pruned = pruned.substr(startFrom, loc) + "." + pruned.substr(loc+2, len);
+	}
+	
+	startFrom = 0;
+	loc = 0;
+	string brSp = "( ";
+	while(loc != std::string::npos)
+	{
+		int len = pruned.size();
+		loc = pruned.find(brSp, startFrom);
+		if(loc != std::string::npos)
+			pruned = pruned.substr(startFrom, loc) + "(" + pruned.substr(loc+2, len);
+	}
+
+	
+	startFrom = 0;
+	loc = 0;
+	string spBr = " )";
+	while(loc != std::string::npos)
+	{
+		int len = pruned.size();
+		loc = pruned.find(spBr, startFrom);
+		if(loc != std::string::npos)
+			pruned = pruned.substr(startFrom, loc) + ")" + pruned.substr(loc+2, len);
+	}
+
 	return pruned;
 }
