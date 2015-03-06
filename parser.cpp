@@ -8,19 +8,27 @@ Parser::Parser()
 Parser::~Parser()
 {
 
-}
+};
 
 string Parser::Parse(string expression)
 {
 	StringPacket output;
 	inputString = pruneString(expression);
-	#if 0
-	output = parseExpression(inputString);
-	
-	if(output.errorCode == 0)
-		return output.s;
+	#if 1
+	if(inputString[0] == '(')
+	{
+		int len = inputString.length();
+		output = parseExpression(inputString.substr(1, len), false);
+		if(output.errorCode == 0)
+			return inputString;
+		else
+			return "The Force Is NOT With You";
+	}
+	else
+	{
 	#endif	
-	return inputString;
+		return "Somebody gonna get hurt real bad";
+	}
 }
 
 // This is a recursive function
@@ -29,26 +37,33 @@ string Parser::Parse(string expression)
 // it will return on seeing a closing paren
 // at each call it will have a list of acceptable tokens it can see and if it sees something else
 // it will push out an error code and a null string.
-StringPacket Parser::parseExpression(string expression)
+StringPacket Parser::parseExpression(string expression, bool listFlag)
 {
 	bool keepParsing = true;
 	string stringSoFar;
 	bool leftSeen = false;
 	bool rightSeen = false;
+	bool pointerSeen = false;
+	bool isList = listFlag;
 	int length = expression.length();
 	int strPtr = 0;
 	StringPacket outPacket;
 	while(keepParsing)
 	{
 		int offset = 1;
-		int tokenId = checkToken(expression[strPtr]);
+		char cur = expression[strPtr];
+		int tokenId = checkToken(cur);
+		cout<<endl<<expression[strPtr]<<"="<<tokenId;
 		strPtr += 1;
+	
 		switch(tokenId)
 		{
 			case 1:
-			{	// opening paren	
+			{	// opening paren
+				cout<<"\nrec1\n";
+				stringSoFar += cur;	
 				string subExpression = expression.substr(strPtr, (length-strPtr));
-				StringPacket retPacket = parseExpression(subExpression);
+				StringPacket retPacket = parseExpression(subExpression, false);
 				if(retPacket.errorCode == 1)
 				{
 					outPacket.errorCode = 1;
@@ -63,47 +78,88 @@ StringPacket Parser::parseExpression(string expression)
 			}
 			case 2:
 			{	// pointer		
-				if(leftSeen == false)
+				if((leftSeen == false) || (leftSeen == true && rightSeen == true)
+					|| (isList == true))
 				{
 					outPacket.errorCode = 1;
+					cout<<"\nerr1\n";
 					return outPacket;
+				}
+				else
+				{
+					stringSoFar += cur;
+					pointerSeen = true;
 				}
 				break;
 			}
 			case 3:
 			{	// whitespace
-				if(leftSeen == false)
+				if(pointerSeen == true)
 				{
-					strPtr += 1;
+					outPacket.errorCode = 1;
+					cout<<"\nerr2\n";
+					return outPacket;	
 				}
 				else
 				{
-					
-					string subExpression = expression.substr(strPtr, (length-strPtr));
-					StringPacket retPacket = parseExpression(subExpression);
+				isList = true;
+				stringSoFar += ".(";
+				cout<<"\nrec2\n";	
+				string subExpression = expression.substr(strPtr, (length-strPtr));
+				StringPacket retPacket = parseExpression(subExpression, isList);
+				if(retPacket.errorCode == 1)
+				{
+					outPacket.errorCode = 1;
+					return outPacket;
+				}
+				else
+				{
+					strPtr += retPacket.offset;
+					stringSoFar += retPacket.s;
+					stringSoFar += ".NIL)";
+				}
 
 				}
 				break;
 			}
 			case 4:
-			{	// closing paren
+			{	// closing paren - Need to handle improper use of this better!!
+				stringSoFar += cur;
+				outPacket.offset = strPtr;
+				outPacket.s = stringSoFar;
 				return outPacket;	
 			}
-			default:
+			case 0:
 			{	// identifier or number
-				if(leftSeen == false)
+				if(pointerSeen == false)
 				{
-					leftSeen == true;
+					leftSeen = true;
+					stringSoFar += cur;
 				}
 				else
 				{
-					
-					
+					rightSeen = true;
+					stringSoFar += cur;
 				}
 				break;			
 			}
+			default:
+			{
+				
+			}
 		}
+	if(strPtr >= length)
+	{
+		outPacket.s = stringSoFar;
+		keepParsing = false;
 	}
+	}
+	if(!isList)
+	{
+		outPacket.errorCode = 1;
+		cout<<"\nimproper end\n";
+	}
+	return outPacket;
 }
 
 string Parser::generateExpression()
@@ -118,15 +174,22 @@ int Parser::checkToken(char ch)
 	switch(ch)
 	{	
 		case '(':
-			return 1;
+			{return 1;}
 		case '.':
-			return 2;
+			{return 2;}
 		case ' ':
-			return 3;
+			{return 3;}
 		case ')':
-			return 4;
+			{return 4;}
 		default:
-			return 0;
+		{
+			int chCode = (int)ch;
+			if((chCode >= 48 && chCode <= 57) ||
+				(chCode >= 65 && chCode <= 90) || (chCode >= 97 && chCode <=122))
+				return 0;
+			else	
+				return -1;
+		}
 	}
 }
 

@@ -16,7 +16,7 @@ int main()
 		getline(cin, input, '$');
 		//cout<<">>"<<input;
 		output = p.Parse(input);
-		cout<<">>"<<output<<endl;
+		cout<<"\n>>"<<output<<endl;
 #if 0
 	std::string::iterator new_end = std::unique(input.begin(), input.end(), BothAreSpaces);
 	input.erase(new_end, input.end());

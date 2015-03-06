@@ -33,7 +33,7 @@ public:
 private:
 
 	string inputString, outputString;
-	StringPacket parseExpression(string expression);
+	StringPacket parseExpression(string expression, bool listFlag);
 	string generateExpression();
 	int checkToken(char ch);
 	string pruneString(string expression);
