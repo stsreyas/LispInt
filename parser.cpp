@@ -78,6 +78,8 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 					outPacket.errorCode = 1;
 					return outPacket;
 				}
+				if(prevToken != 3)
+				{
 				string subExpression = expression.substr(strPtr, (length-strPtr));
 				sExpression * child = parent->initLeaf();
 				if(child == NULL)
@@ -97,6 +99,7 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				{
 					strPtr += retPacket.offset;
 					//cout<<"ptr="<<strPtr<<endl;
+				}
 				}
 				break;
 			}
@@ -144,8 +147,9 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 					#ifdef LOG
 					cout<<"\nrec2\n";	
 					#endif
-					if(prevToken == 0)
+					if(parent->left == NULL)
 					{
+						cout<<"MM\n";
 						sExpression * child1 = parent->initLeaf();
 						child1->setString(stringSoFar);
 						stringSoFar = "";
