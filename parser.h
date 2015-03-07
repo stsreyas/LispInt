@@ -26,6 +26,20 @@ typedef struct stringPacket
 	int offset;
 }StringPacket;
 
+typedef struct paramPacket
+{
+	paramPacket()
+	{
+		isList = false;
+		prevToken = -1;
+		parent = NULL;
+	}
+	bool isList;
+	int prevToken;
+	sExpression * parent;
+	string input;
+}ParamPacket;
+
 class Parser
 {
 public:
@@ -36,8 +50,10 @@ public:
 private:
 
 	string inputString, outputString;
-	StringPacket parseExpression(string expression, bool listFlag, sExpression * parent);
-	string generateExpression();
+	StringPacket parseExpression(string expression, bool listFlag, sExpression * parent, int prevToken);
+	//ParamPacket parseExpression(ParamPacket input)
+	void generateExpression();
+	void traverseAndGenerate(sExpression * parent);
 	int checkToken(char ch);
 	string pruneString(string expression);
 	sExpression * expTree;

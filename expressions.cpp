@@ -5,6 +5,7 @@ sExpression::sExpression()
 	this->left = NULL;
 	this->right = NULL;
 	id = 0;
+	type = ATOMIC;
 }
 
 sExpression::sExpression(ExpressionType eType)
@@ -38,6 +39,7 @@ bool sExpression::insert(sExpression * leaf)
 
 sExpression * sExpression::initLeaf()
 {
+	this->type = NON_ATOMIC;
 	if(this->left == NULL)
 	{
 		cout<<"\nLEFT\n";

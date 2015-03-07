@@ -18,7 +18,7 @@ struct node
 }
 #endif
 
-typedef enum expType{ATOMIC_NUMBER, ATOMIC_ID, NON_ATOMIC}ExpressionType;
+typedef enum expType{ATOMIC, NON_ATOMIC}ExpressionType;
 
 class sExpression
 {
@@ -36,7 +36,6 @@ public:
 	sExpression * left;
 	sExpression * right;
 
-private:
 	ExpressionType type;
 	string s;
 	int id;

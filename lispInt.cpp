@@ -7,16 +7,21 @@ int main()
 {
 	Parser p;
 	string expression;	
-	bool expressionIncomplete = true;
-	while(expressionIncomplete)
+	bool keepRunning = true;
+	while(keepRunning)
 	{
 		string input;
 		string output;
 		cout<<">";
 		getline(cin, input, '$');
-		//cout<<">>"<<input;
-		output = p.Parse(input);
-		cout<<"\n>>"<<output<<endl;
+		if(input.length() > 0)
+		{
+			//cout<<">>"<<input;
+			output = p.Parse(input);
+			cout<<"\n>>"<<output<<endl;
+		}
+		else
+			keepRunning = false;
 #if 0
 	std::string::iterator new_end = std::unique(input.begin(), input.end(), BothAreSpaces);
 	input.erase(new_end, input.end());

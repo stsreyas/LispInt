@@ -19,9 +19,14 @@ string Parser::Parse(string expression)
 	{
 		int len = inputString.length();
 		expTree = new sExpression;
-		output = parseExpression(inputString.substr(1, len), false, expTree);
+		outputString = "";
+		output = parseExpression(inputString.substr(1, len), false, expTree, 1);
+		//output = parseExpression(inputString, false, expTree, 1);
 		if(output.errorCode == 0)
-			return inputString;
+		{
+			generateExpression();	
+			return outputString;
+		}
 		else
 			return "The Force Is NOT With You";
 	}
@@ -38,9 +43,11 @@ string Parser::Parse(string expression)
 // it will return on seeing a closing paren
 // at each call it will have a list of acceptable tokens it can see and if it sees something else
 // it will push out an error code and a null string.
-StringPacket Parser::parseExpression(string expression, bool listFlag, sExpression * parent)
+StringPacket Parser::parseExpression(string expression, bool listFlag, sExpression * parent, int prevToken)
 {
 	bool keepParsing = true;
+	//sExpression * leftChild = parent->left;
+	//sExpression * rightChild = parent->right;
 	string stringSoFar;
 	bool leftSeen = false;
 	bool rightSeen = false;
@@ -62,16 +69,25 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 		{
 			case 1:
 			{	// opening paren
+				// valid when it follows a space, pointer or another paren
 				#ifdef LOG
 				cout<<"\nrec1\n";
 				#endif
+				if(prevToken == 0)
+				{
+					outPacket.errorCode = 1;
+					return outPacket;
+				}
 				string subExpression = expression.substr(strPtr, (length-strPtr));
 				sExpression * child = parent->initLeaf();
-				child->setString(stringSoFar);
 				if(child == NULL)
+				{	
 					cout<<"Something is wrong!!!\n";
-					
-				StringPacket retPacket = parseExpression(subExpression, false, child);
+					outPacket.errorCode = 1;
+					return outPacket;
+				}
+				prevToken = 1;	
+				StringPacket retPacket = parseExpression(subExpression, false, child, 1);
 				if(retPacket.errorCode == 1)
 				{
 					outPacket.errorCode = 1;
@@ -80,13 +96,16 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				else
 				{
 					strPtr += retPacket.offset;
-					cout<<"ptr="<<strPtr<<endl;
+					//cout<<"ptr="<<strPtr<<endl;
 				}
 				break;
 			}
 			case 2:
 			{	// pointer		
-				if((leftSeen == false) || (leftSeen == true && rightSeen == true)
+				// valid when it follows a idn or closing paren only when there hasnt
+				// been another pointer at this level of the recursion
+				prevToken = 2;
+				if(((leftSeen == false) && parent->left == NULL) || (leftSeen == true && rightSeen == true)
 					|| (isList == true))
 				{
 					outPacket.errorCode = 1;
@@ -98,14 +117,19 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				else
 				{
 					pointerSeen = true;
-					sExpression * child = parent->initLeaf();
-					child->setString(stringSoFar);
+					if((parent->left == NULL))
+					{
+						sExpression * child = parent->initLeaf();
+						child->setString(stringSoFar);
+					}
 					stringSoFar = "";
 				}
 				break;
 			}
 			case 3:
 			{	// whitespace
+				// valid when it follows an idn, closing paren and no pointer seen
+				// at this level of the recursion
 				if(pointerSeen == true)
 				{
 					outPacket.errorCode = 1;
@@ -116,43 +140,55 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				}
 				else
 				{
-				isList = true;
-				#ifdef LOG
-				cout<<"\nrec2\n";	
-				#endif
-				sExpression * child = parent->initLeaf();
-				sExpression * grandChild = child->initLeaf();
-				if(child == NULL)
-					cout<<"Something is Wrong!!\n!";
-				string subExpression = expression.substr(strPtr, (length-strPtr));
-				StringPacket retPacket = parseExpression(subExpression, isList, grandChild);
-				if(retPacket.errorCode == 1)
-				{
-					outPacket.errorCode = 1;
-					return outPacket;
-				}
-				else
-				{
-					strPtr += retPacket.offset;
-					cout<<"ptr="<<strPtr<<endl;
-				}
+					isList = true;
+					#ifdef LOG
+					cout<<"\nrec2\n";	
+					#endif
+					if(prevToken == 0)
+					{
+						sExpression * child1 = parent->initLeaf();
+						child1->setString(stringSoFar);
+						stringSoFar = "";
+					}
+					sExpression * child2 = parent->initLeaf();
+					//rightGrandChild = rightChild->initLeaf();
+					if(child2 == NULL)
+						cout<<"Something is Wrong!!\n!";
+					string subExpression = expression.substr(strPtr, (length-strPtr));
+					StringPacket retPacket = parseExpression(subExpression, isList, child2, 3);
+					if(retPacket.errorCode == 1)
+					{
+						outPacket.errorCode = 1;
+						return outPacket;
+					}	
+					else
+					{
+						strPtr += retPacket.offset;
+						cout<<"ptr="<<strPtr<<endl;
+					}
 
+					prevToken = 3;
 				}
 				break;
 			}
 			case 4:
 			{	// closing paren - Need to handle improper use of this better!!
-				outPacket.offset = strPtr;
-				sExpression * child = parent->initLeaf();
-				child->setString(stringSoFar);
-				if(isList)
+				// valid only when an opening paren seen before
+				if(expression[strPtr-2] != ')')
+				{
+					sExpression * child = parent->initLeaf();
+					child->setString(stringSoFar);
+				}
+				if(isList);
 				{
 					cout<<"here\n";
-					sExpression * lastChild = parent->right->initLeaf();
+					sExpression * lastChild = parent->initLeaf();
 					lastChild->setString("NIL");
 					cout<<"not Here\n";
 				}
+				prevToken = 4;
 				outPacket.s = stringSoFar;
+				outPacket.offset = strPtr;
 				return outPacket;	
 			}
 			case 0:
@@ -161,17 +197,20 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 				{
 					leftSeen = true;
 					stringSoFar += cur;
+					prevToken = 0;
 				}
 				else
 				{
 					rightSeen = true;
 					stringSoFar += cur;
+					prevToken = 0;
 				}
 				break;			
 			}
 			default:
 			{
-				
+				outPacket.errorCode = 1;
+				return outPacket;
 			}
 		}
 	if(strPtr >= length)
@@ -189,12 +228,78 @@ StringPacket Parser::parseExpression(string expression, bool listFlag, sExpressi
 	return outPacket;
 }
 
-string Parser::generateExpression()
+#if 0
+ParamPacket Parser::parseExpression(ParamPacket input)
 {
+
+	bool keepParsing = true;
+	sExpression * leftChild = input.parent->left;
+	sExpression * rightChild = input.parent->right;
+	string stringSoFar;
+	bool pointerSeen = false;
+	bool isList = listFlag;
+	int length = expression.length();
+	int strPtr = 0;
+	ParamPacket output;
+	while(keepParsing)
+	{
+		char cur = expression[strPtr];
+		int tokenId = checkToken(cur);
+		#ifdef LOG
+		cout<<endl<<expression[strPtr]<<"="<<tokenId;
+		#endif
+		strPtr += 1;
+	
+		switch(tokenId)
+		{
+			case 1:
+			{	// opening paren
+				// valid when it follows a space, pointer or another paren
+				#ifdef LOG
+				cout<<"\nrec1\n";
+				#endif
+				string subExpression = expression.substr(strPtr, (length-strPtr));
+				leftChild = new sExpression;
+				//child->setString(stringSoFar);
+				if(leftChild == NULL)
+				{	
+					cout<<"Something is wrong!!!\n";
+					outPacket.errorCode = 1;
+					return outPacket;
+				}
+					
+				StringPacket retPacket = parseExpression(subExpression, false, leftChild);
+				if(retPacket.errorCode == 1)
 
 
 }
+#endif
 
+
+void Parser::generateExpression()
+{
+	traverseAndGenerate(expTree);
+	//return outputString;
+}
+
+
+void Parser::traverseAndGenerate(sExpression * parent)
+{
+	if(parent->type == ATOMIC)
+	{
+		outputString += parent->s;
+		return;	
+	}
+	else
+	{
+		outputString += "(";
+		traverseAndGenerate(parent->left);
+		outputString += ".";
+		traverseAndGenerate(parent->right);
+		outputString += ")";
+		return;
+	}
+}
 
 int Parser::checkToken(char ch)
 {
