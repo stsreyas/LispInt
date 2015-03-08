@@ -8,17 +8,12 @@ sExpression::sExpression()
 	type = ATOMIC;
 }
 
-sExpression::sExpression(ExpressionType eType)
-{
-	this->left = NULL;
-	this->right = NULL;
-	id = 0;
-	type = eType; 
-}
-
 sExpression::~sExpression()
 {
-	
+	if(this->left != NULL)
+		delete this->left;
+	if(this->right != NULL)
+		delete this->right;
 }
 
 sExpression * sExpression::initLeaf()
