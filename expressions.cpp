@@ -21,36 +21,16 @@ sExpression::~sExpression()
 	
 }
 
-#if 0
-bool sExpression::insert(sExpression * leaf)
-{
-	if(this->left == NULL)
-	{	
-		this->left = leaf;
-		return true;
-	}
-	else if(this->right == NULL)
-	{
-		this->right = leaf;
-		return true;
-	}
-	else
-		return false;
-}
-#endif
-
 sExpression * sExpression::initLeaf()
 {
 	this->type = NON_ATOMIC;
 	if(this->left == NULL)
 	{
-		cout<<"\nLEFT\n";
 		this->left = new sExpression;
 		return this->left;
 	}
 	else if(this->right == NULL)
 	{
-		cout<<"\nRIGHT\n";
 		this->right = new sExpression;
 		return this->right;
 	}
