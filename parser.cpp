@@ -41,7 +41,7 @@ bool Parser::encodeString(string input)
 		_inputEncoded[i] = checkToken(input[i]);
 		if(_inputEncoded[i] == -1)
 		{	
-			cout<<"Invalid character "<< i<<endl; 
+			cout<<"Invalid character at "<< i<<endl; 
 			return false;
 		}
 	}
@@ -55,11 +55,18 @@ ParamPacket Parser::evaluateExpression()
 	if(_inputEncoded[0] == 1)
 	{
 		output = evaluate(1, expTree, false);
+		if((output._errorCode == 0) && (output._strPtr < inputString.length()))
+		{
+			output._errorCode = 1;
+			output._errorMessage = "Improper termination";
+		}
 	}
 	else
-	{
-		output._errorCode = 1;
-		output._errorMessage = "Invalid starting symbol";
+	{	if(inputString.length() >= 1)
+		{
+			output._errorCode = 1;
+			output._errorMessage = "Invalid starting symbol";
+		}
 	}
 	return output;
 }
@@ -81,6 +88,12 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 	{
 		if(_inputEncoded[strPtr] == 1)
 		{
+			if((_inputEncoded[strPtr-1] == 0) || (_inputEncoded[strPtr-1] == 4))
+			{
+				output._errorCode = 1;
+				output._errorMessage = "Improper syntax";
+				return output;
+			}
 			sExpression * child = parent->initLeaf();
 			ParamPacket retPacket = evaluate(strPtr + 1, child, false);
 			if(retPacket._errorCode == 1)
@@ -108,10 +121,10 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		else if(_inputEncoded[strPtr] == 2)
 		{	
 			// only valid when there is only 1 sExpression so far
-			if(numExpressions > 1)
+			if((numExpressions > 1)||(listFlag == true))
 			{
 				output._errorCode = 1;
-				string err = "invalid . used";
+				string err = "Invalid . used";
 				output._errorMessage = err;
 				return output;
 			}
