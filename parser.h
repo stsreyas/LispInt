@@ -35,6 +35,7 @@ public:
 		_parent = NULL;
 		_strPtr = 0;
 		_errorCode = 0;
+		_pointerSeen = false;
 	}
 	ParamPacket(string input, string encoded, sExpression * parent, bool isList)
 	{
@@ -44,6 +45,7 @@ public:
 		_isList = isList;	
 	}
 	bool _isList;
+	bool _pointerSeen;
 	int _strPtr;
 	sExpression * _parent;
 	string _input;

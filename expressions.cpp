@@ -59,5 +59,6 @@ sExpression * sExpression::initLeaf()
 
 void sExpression::setString(string s)
 {
+	this->s = ATOMIC;
 	this->s = s;
 }

@@ -157,11 +157,14 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				output._errorMessage = err;
 				return output;
 			}
+			output._pointerSeen = true;
 			strPtr++;
 		}
 		else if(_inputEncoded[strPtr] == 4)
 		{
-			if(output._isList == true)
+			if((numExpressions <=1) && (output._pointerSeen == false))
+				output._isList = true;
+			if((output._isList == true))// || (parent->left == NULL))
 			{
 				sExpression * child = parent->initLeaf();
 				child->setString("NIL");
@@ -448,9 +451,13 @@ void Parser::traverseAndGenerate(sExpression * parent)
 	else
 	{
 		outputString += "(";
-		traverseAndGenerate(parent->left);
-		outputString += ".";
-		traverseAndGenerate(parent->right);
+		if(parent->left != NULL)
+			traverseAndGenerate(parent->left);
+		if(parent->right != NULL)
+		{
+			outputString += ".";
+			traverseAndGenerate(parent->right);
+		}
 		outputString += ")";
 		return;
 	}
