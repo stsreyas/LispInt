@@ -156,20 +156,20 @@ void Parser::generateExpression()
 
 void Parser::traverseAndGenerate(sExpression * parent)
 {
-	if(parent->type == ATOMIC)
+	if(parent->getType() == ATOMIC)
 	{
-		outputString += parent->s;
+		outputString += parent->getString();
 		return;	
 	}
 	else
 	{
 		outputString += "(";
-		if(parent->left != NULL)
-			traverseAndGenerate(parent->left);
-		if(parent->right != NULL)
+		if(parent->getLeft() != NULL)
+			traverseAndGenerate(parent->getLeft());
+		if(parent->getRight() != NULL)
 		{
 			outputString += ".";
-			traverseAndGenerate(parent->right);
+			traverseAndGenerate(parent->getRight());
 		}
 		outputString += ")";
 		return;

@@ -37,3 +37,27 @@ void sExpression::setString(string s)
 	this->s = ATOMIC;
 	this->s = s;
 }
+
+sExpression * sExpression::getLeft()
+{
+	if(this->left != NULL)
+		return this->left;
+	return NULL;
+}
+
+sExpression * sExpression::getRight()
+{
+	if(this->right != NULL)
+		return this->right;
+	return NULL;
+}
+
+ExpressionType sExpression::getType()
+{
+	return this->type;
+}
+
+string sExpression::getString()
+{
+	return this->s;
+}
