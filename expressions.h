@@ -26,16 +26,14 @@ public:
 	sExpression();
 	sExpression(ExpressionType eType);
 	~sExpression();
-	bool insert(sExpression * leaf);
+	//bool insert(sExpression * leaf);
 	sExpression * initLeaf();
 	void setString(string s);
 	//void setExpressionType(ExpressionType eType);
 	//void traverse();
 	//void destroy();	
-	
 	sExpression * left;
 	sExpression * right;
-
 	ExpressionType type;
 	string s;
 	int id;

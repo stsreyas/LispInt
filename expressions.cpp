@@ -21,6 +21,7 @@ sExpression::~sExpression()
 	
 }
 
+#if 0
 bool sExpression::insert(sExpression * leaf)
 {
 	if(this->left == NULL)
@@ -36,6 +37,7 @@ bool sExpression::insert(sExpression * leaf)
 	else
 		return false;
 }
+#endif
 
 sExpression * sExpression::initLeaf()
 {

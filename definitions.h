@@ -4,6 +4,7 @@
 using namespace std;
 
 #include <iostream>
+#include <stdio.h>
 
 typedef enum validTokens{INVALID, BRACE_OPEN, BRACE_CLOSED, COMMA, WHITESPACE, POINTER, INTEGER, IDENTIFIER} ValidTokens;
 
