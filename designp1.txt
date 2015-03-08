@@ -1,0 +1,39 @@
+# Lisp Interpreter
+# Design document
+# Sreyas Srimath Tirumala (srimath-tirumala.1)
+
+
+The design of my parser is quite intuitive and can be broadly broken down into two parts:
+
+- recursively parse the input when a space or an opening bracket is seen since this is the place where the tree branches. Simultaneously create the s-expression tree which is stored in a class object pointer.
+
+- inorder traversal of this tree returns the dot notation string.
+
+
+This can be further explained:
+
+
+1) Recursive parsing:
+
+There are a couple of operations done before the recursive parsing which are:
+	a) Pruning - This removes all the extra whitespaces and returns 	from the input string, which makes the job of the next guys 		really easier
+	b) Token Code - This generates a token code for the entire strin	 based on the code 0-id/number, 1-opening brace, 2-pointer,
+	3- whitespace, 4-closing brace.
+
+Now we recursively parse the string.
+- The recursive parser gets the pointer to the parent sExpression.
+- When it sees a opening brace or a whitespace, it recursively calls itself with the child of this parent.
+- When the expression sees a closing brace, it returns and these recursion returns are handled to make sure the parsing is done properly
+- The binary tree so generated is stored in the class under expTree.
+- When a new identifier or number is seen, its text equivalent is parsed and stored in the child of the parent at the current recursion.
+
+After the recursive parsing, the binary tree is traversed using basic inorder traversal and all the strings of the terminals are concatenated to form the expression:
+
+- Add an opening brace on going left
+- Add the string stored in the atomic s-exp
+- On going back up add a "."
+- Go right
+- Add the string stored in the atomic on the right side
+- Add a closing brace
+
+In all about 12 lines of code to traverse and generate the string!
