@@ -46,7 +46,6 @@ private:
 	ParamPacket evaluate(int strPtr, sExpression *tree, bool listFlag);
 	string pruneString(string expression);
 	sExpression * expTree;
-	
 };
 
 #endif

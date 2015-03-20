@@ -121,6 +121,12 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		else if(_inputEncoded[strPtr] == 2)
 		{	
 			// only valid when there is only 1 sExpression so far
+			if((_inputEncoded[strPtr-1] == 3) || (_inputEncoded[strPtr-1] == 1))
+			{
+				output._errorCode = 1;
+				output._errorMessage = "Improper syntax";
+				return output;
+			}
 			if((numExpressions > 1)||(listFlag == true))
 			{
 				output._errorCode = 1;
@@ -133,6 +139,12 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		}
 		else if(_inputEncoded[strPtr] == 4)
 		{
+			if((_inputEncoded[strPtr-1] == 2) || (_inputEncoded[strPtr-1] == 3))
+			{
+				output._errorCode = 1;
+				output._errorMessage = "Improper syntax";
+				return output;
+			}
 			if((numExpressions <=1) && (output._pointerSeen == false))
 				output._isList = true;
 			if((output._isList == true))// || (parent->left == NULL))
