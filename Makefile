@@ -11,7 +11,7 @@ OBJS=$(SRCS:.cpp=.o)
 RM = rm 
 # end
 
-all:$(SRCS) $(EXECUTABLE)
+all:clean $(SRCS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $@ 
