@@ -41,7 +41,7 @@ bool Parser::encodeString(string input)
 		_inputEncoded[i] = checkToken(input[i]);
 		if(_inputEncoded[i] == -1)
 		{	
-			cout<<"Error: Invalid character at "<<i<<endl; 
+			cout<<">>Error: Invalid character at "<<i<<endl; 
 			return false;
 		}
 	}
@@ -108,6 +108,12 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		}
 		else if(_inputEncoded[strPtr] == 3)
 		{
+			if(output._pointerSeen)
+			{
+				output._errorCode = 1;
+				output._errorMessage += "Invalid whitespace used";
+				return output;
+			}
 			output._isList = true;
 			sExpression * child = parent->initLeaf();
 			ParamPacket retPacket = evaluate(strPtr + 1, child, output._isList);
@@ -117,7 +123,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				return output;
 			}
 			else
-			output._strPtr = retPacket._strPtr;
+				output._strPtr = retPacket._strPtr;
 			return output;
 		}
 		else if(_inputEncoded[strPtr] == 2)
@@ -125,7 +131,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 			if((numExpressions > 1)||(listFlag == true))
 			{
 				output._errorCode = 1;
-				output._errorMessage += "Invalid . used";
+				output._errorMessage += "Invalid pointer used";
 				return output;
 			}
 			output._pointerSeen = true;
