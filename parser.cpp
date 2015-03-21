@@ -41,7 +41,7 @@ bool Parser::encodeString(string input)
 		_inputEncoded[i] = checkToken(input[i]);
 		if(_inputEncoded[i] == -1)
 		{	
-			cout<<"Invalid character at "<< i<<endl; 
+			cout<<"Error: Invalid character at "<<i<<endl; 
 			return false;
 		}
 	}
@@ -58,14 +58,14 @@ ParamPacket Parser::evaluateExpression()
 		if((output._errorCode == 0) && (output._strPtr < inputString.length()))
 		{
 			output._errorCode = 1;
-			output._errorMessage = "Improper termination";
+			output._errorMessage += "Improper termination";
 		}
 	}
 	else
 	{	if(inputString.length() >= 1)
 		{
 			output._errorCode = 1;
-			output._errorMessage = "Invalid starting symbol";
+			output._errorMessage += "Invalid starting symbol";
 		}
 	}
 	return output;
@@ -86,14 +86,16 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 	output._isList = listFlag;
 	while(keepRunning)
 	{
+		int curCode = _inputEncoded[strPtr];
+		int prevCode = _inputEncoded[strPtr-1];
+		if(!TRANSITION[curCode][prevCode])
+		{
+			output._errorCode = 1;
+			output._errorMessage += TOKENCODE[prevCode] + " cannot precede " + TOKENCODE[curCode];
+			return output;
+		}
 		if(_inputEncoded[strPtr] == 1)
 		{
-			if((_inputEncoded[strPtr-1] == 0) || (_inputEncoded[strPtr-1] == 4))
-			{
-				output._errorCode = 1;
-				output._errorMessage = "Improper syntax";
-				return output;
-			}
 			sExpression * child = parent->initLeaf();
 			ParamPacket retPacket = evaluate(strPtr + 1, child, false);
 			if(retPacket._errorCode == 1)
@@ -120,18 +122,10 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		}
 		else if(_inputEncoded[strPtr] == 2)
 		{	
-			// only valid when there is only 1 sExpression so far
-			if((_inputEncoded[strPtr-1] == 3) || (_inputEncoded[strPtr-1] == 1))
-			{
-				output._errorCode = 1;
-				output._errorMessage = "Improper syntax";
-				return output;
-			}
 			if((numExpressions > 1)||(listFlag == true))
 			{
 				output._errorCode = 1;
-				string err = "Invalid . used";
-				output._errorMessage = err;
+				output._errorMessage += "Invalid . used";
 				return output;
 			}
 			output._pointerSeen = true;
@@ -139,12 +133,6 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		}
 		else if(_inputEncoded[strPtr] == 4)
 		{
-			if((_inputEncoded[strPtr-1] == 2) || (_inputEncoded[strPtr-1] == 3))
-			{
-				output._errorCode = 1;
-				output._errorMessage = "Improper syntax";
-				return output;
-			}
 			if((numExpressions <=1) && (output._pointerSeen == false))
 				output._isList = true;
 			if((output._isList == true))// || (parent->left == NULL))
@@ -168,7 +156,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		{
 			keepRunning = false;
 			output._errorCode = 1;
-			output._errorMessage = "Closing Paren Not Found";
+			output._errorMessage += "Closing Paren Not Found";
 			return output;
 		}
 	}
@@ -241,63 +229,28 @@ string Parser::pruneString(string expression)
 		startFrom = loc + 1;
 	}
 
-	// prune multiple whitespaces from string
-	startFrom = 0;
-	loc = 0;
-	string multSp = "  ";
-	while(loc != std::string::npos)
-	{
-		int len = pruned.size();
-		loc = pruned.find(multSp, startFrom);
-		if(loc != std::string::npos)
-			pruned = pruned.substr(startFrom, loc) + " " + pruned.substr(loc+2, len);	
-	}
-	
-	// prune remaining spaces
-	startFrom = 0;
-	loc = 0;
-	string spDot = " .";
-	while(loc != std::string::npos)
-	{
-		int len = pruned.size();
-		loc = pruned.find(spDot, startFrom);
-		if(loc != std::string::npos)
-			pruned = pruned.substr(startFrom, loc) + "." + pruned.substr(loc+2, len);
-	}
-	
-	startFrom = 0;
-	loc = 0;
-	string dotSp = ". ";
-	while(loc != std::string::npos)
-	{
-		int len = pruned.size();
-		loc = pruned.find(dotSp, startFrom);
-		if(loc != std::string::npos)
-			pruned = pruned.substr(startFrom, loc) + "." + pruned.substr(loc+2, len);
-	}
-	
-	startFrom = 0;
-	loc = 0;
-	string brSp = "( ";
-	while(loc != std::string::npos)
-	{
-		int len = pruned.size();
-		loc = pruned.find(brSp, startFrom);
-		if(loc != std::string::npos)
-			pruned = pruned.substr(startFrom, loc) + "(" + pruned.substr(loc+2, len);
-	}
-
-	
-	startFrom = 0;
-	loc = 0;
-	string spBr = " )";
-	while(loc != std::string::npos)
-	{
-		int len = pruned.size();
-		loc = pruned.find(spBr, startFrom);
-		if(loc != std::string::npos)
-			pruned = pruned.substr(startFrom, loc) + ")" + pruned.substr(loc+2, len);
-	}
+	pruned = pruneCharacters(pruned, "  ", " ");
+	pruned = pruneCharacters(pruned, " .", ".");
+	pruned = pruneCharacters(pruned, ". ", ".");
+	pruned = pruneCharacters(pruned, "( ", "(");
+	pruned = pruneCharacters(pruned, " )", ")");
 
 	return pruned;
+}
+
+string Parser::pruneCharacters(string input, string str2Find, string strReplace)
+{
+	string output;
+	int startFrom = 0;
+	int loc = 0;
+	int expLength = str2Find.length();
+	while(loc != (int)std::string::npos)
+	{
+		int len = input.size();
+		loc = input.find(str2Find, startFrom);
+		if(loc != (int)std::string::npos)
+			input = input.substr(startFrom, loc) + strReplace + input.substr(loc+expLength, len);
+	}
+	output = input;
+	return output;
 }

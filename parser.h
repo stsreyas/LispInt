@@ -19,6 +19,7 @@ public:
 		_strPtr = 0;
 		_errorCode = 0;
 		_pointerSeen = false;
+		_errorMessage = "Error: ";
 	}
 	bool _isList;
 	bool _pointerSeen;
@@ -45,6 +46,7 @@ private:
 	ParamPacket evaluateExpression();
 	ParamPacket evaluate(int strPtr, sExpression *tree, bool listFlag);
 	string pruneString(string expression);
+	string pruneCharacters(string input, string str2Find, string strReplace);
 	sExpression * expTree;
 };
 
