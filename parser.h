@@ -45,6 +45,7 @@ private:
 	bool encodeString(string input);
 	ParamPacket evaluateExpression();
 	ParamPacket evaluate(int strPtr, sExpression *tree, bool listFlag);
+	ParamPacket checkSyntax();
 	string pruneString(string expression);
 	string pruneCharacters(string input, string str2Find, string strReplace);
 	sExpression * expTree;

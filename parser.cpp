@@ -20,7 +20,10 @@ string Parser::Parse(string expression)
 	bool status = encodeString(inputString);
 	if(status)
 	{
-		ParamPacket out = evaluateExpression();
+		ParamPacket transition = checkSyntax();
+		if(transition._errorCode == 0)
+		{
+			ParamPacket out = evaluateExpression();
 			if(out._errorCode == 0)
 			{
 				generateExpression();
@@ -28,8 +31,28 @@ string Parser::Parse(string expression)
 			}
 			else
 				return out._errorMessage;
+		}
+		else
+			return transition._errorMessage;
 	}
 	return outputString;
+}
+
+ParamPacket Parser::checkSyntax()
+{
+	ParamPacket output;
+	int len = inputString.length();
+	for(int i = 1; i < len; i++)
+	{
+		int prevCode = _inputEncoded[i-1];
+		int curCode = _inputEncoded[i];
+		if(!TRANSITION[curCode][prevCode])
+		{
+			output._errorCode = 1;
+			output._errorMessage += TOKENCODE[prevCode] + " cannot precede " + TOKENCODE[curCode] + ";\n\t";
+		}
+	}
+	return output;
 }
 
 bool Parser::encodeString(string input)
@@ -52,7 +75,7 @@ ParamPacket Parser::evaluateExpression()
 {
 	ParamPacket output;
 	expTree = new sExpression;
-	if(_inputEncoded[0] == 1)
+	if(_inputEncoded[0] == 3)
 	{
 		output = evaluate(1, expTree, false);
 		if((output._errorCode == 0) && (output._strPtr < inputString.length()))
@@ -88,13 +111,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 	{
 		int curCode = _inputEncoded[strPtr];
 		int prevCode = _inputEncoded[strPtr-1];
-		if(!TRANSITION[curCode][prevCode])
-		{
-			output._errorCode = 1;
-			output._errorMessage += TOKENCODE[prevCode] + " cannot precede " + TOKENCODE[curCode];
-			return output;
-		}
-		if(_inputEncoded[strPtr] == 1)
+		if(curCode == 3)
 		{
 			sExpression * child = parent->initLeaf();
 			ParamPacket retPacket = evaluate(strPtr + 1, child, false);
@@ -106,7 +123,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 			else
 				strPtr = retPacket._strPtr;
 		}
-		else if(_inputEncoded[strPtr] == 3)
+		else if(curCode == 5)
 		{
 			if(output._pointerSeen)
 			{
@@ -126,7 +143,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				output._strPtr = retPacket._strPtr;
 			return output;
 		}
-		else if(_inputEncoded[strPtr] == 2)
+		else if(curCode == 4)
 		{	
 			if((numExpressions > 1)||(listFlag == true))
 			{
@@ -137,11 +154,11 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 			output._pointerSeen = true;
 			strPtr++;
 		}
-		else if(_inputEncoded[strPtr] == 4)
+		else if(curCode == 6)
 		{
 			if((numExpressions <=1) && (output._pointerSeen == false))
 				output._isList = true;
-			if((output._isList == true))// || (parent->left == NULL))
+			if((output._isList == true))
 			{
 				sExpression * child = parent->initLeaf();
 				child->setString("NIL");
@@ -153,10 +170,33 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		{	// create a new atomic sExpression
 			numExpressions++;
 			sExpression * child = parent->initLeaf();
-			string atomic;
-			while(_inputEncoded[strPtr] == 0)
-				atomic += inputString[strPtr++];
-			child->setString(atomic);
+			if(curCode == 0 || curCode == 2)
+			{	// numeric sExpression
+				string atomic;
+				while(_inputEncoded[strPtr] <= 2)
+				{
+					if(_inputEncoded[strPtr] == 1)
+					{
+						int curCode = _inputEncoded[strPtr];
+						int prevCode = _inputEncoded[strPtr-1];
+						output._errorCode = 1;
+						output._errorMessage += TOKENCODE[prevCode] + " cannot contain " + TOKENCODE[curCode];
+						return output;
+					}
+					atomic += inputString[strPtr++];
+				}
+				std::string::size_type sz;
+				int val = std::stoi(atomic, &sz);
+				child->setString(atomic);
+				child->setValue(val);//If setString happens after setValue there is going to be trouble. Need to fix!!	
+			}
+			else
+			{
+				string atomic;
+				while(_inputEncoded[strPtr] <= 1)
+					atomic += inputString[strPtr++];
+				child->setString(atomic);
+			}
 		}
 		if(strPtr >= inputString.length())
 		{
@@ -175,7 +215,8 @@ void Parser::generateExpression()
 
 void Parser::traverseAndGenerate(sExpression * parent)
 {
-	if(parent->getType() == ATOMIC)
+	if(parent->getType() == ATOMIC_SYMBOLIC ||
+		parent->getType() == ATOMIC_NUMERIC)
 	{
 		outputString += parent->getString();
 		return;	
@@ -200,20 +241,22 @@ int Parser::checkToken(char ch)
 	switch(ch)
 	{	
 		case '(':
-			{return 1;}
-		case '.':
-			{return 2;}
-		case ' ':
 			{return 3;}
-		case ')':
+		case '.':
 			{return 4;}
+		case ' ':
+			{return 5;}
+		case ')':
+			{return 6;}
 		default:
 		{
 			int chCode = (int)ch;
-			if((chCode >= 48 && chCode <= 57) ||
-				(chCode >= 65 && chCode <= 90) || (chCode >= 97 && chCode <=122) ||
-				(chCode == 45))
+			if((chCode >= 48 && chCode <= 57))
 				return 0;
+			else if((chCode >= 65 && chCode <= 90) || (chCode >= 97 && chCode <=122))
+				return 1;
+			else if ((chCode == 45) || (chCode == 43)) 
+				return 2;
 			else	
 				return -1;
 		}

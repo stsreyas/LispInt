@@ -4,8 +4,8 @@ sExpression::sExpression()
 {
 	this->left = NULL;
 	this->right = NULL;
-	id = 0;
-	type = ATOMIC;
+	val = 0;
+	type = UNKNOWN;
 }
 
 sExpression::~sExpression()
@@ -34,9 +34,15 @@ sExpression * sExpression::initLeaf()
 
 void sExpression::setString(string s)
 {
-	this->s = ATOMIC;
+	this->type = ATOMIC_SYMBOLIC;
 	this->s = s;
 }
+
+void sExpression::setValue(int val)
+{
+	this->type = ATOMIC_NUMERIC;
+	this->val = val;
+} 
 
 sExpression * sExpression::getLeft()
 {
