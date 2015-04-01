@@ -28,7 +28,7 @@ sExpression * Evaluator::eval(sExpression * input)
 
 sExpression * Evaluator::returnExpression(string name)
 {
-        sExpression *obj = _userDefs->returnObject(name);
+        sExpression *obj = _userDefs->returnExisting(name);
 	if(obj == NULL)
 	{
 		std::string::size_type sz;
@@ -141,6 +141,24 @@ sExpression * Evaluator::apply(sExpression * f, sExpression * input, aList a)
 			return PrimitiveFunctions::ATOM(input->getLeft());
 		else if(f->getString() == "NULL")
 			return PrimitiveFunctions::ISNULL(input->getLeft());
+		else if(f->getString() == "INT")
+			return PrimitiveFunctions::INT(input->getLeft());
+		else if(f->getString() == "PLUS")
+			return PrimitiveFunctions::PLUS(input);
+		else if(f->getString() == "MINUS")
+			return PrimitiveFunctions::MINUS(input);
+		else if(f->getString() == "TIMES")
+			return PrimitiveFunctions::TIMES(input);
+		else if(f->getString() == "QUOTIENT")
+			return PrimitiveFunctions::QUOTIENT(input);
+		else if(f->getString() == "REMAINDER")
+			return PrimitiveFunctions::REMAINDER(input);
+		else if(f->getString() == "LESS")
+			return PrimitiveFunctions::LESS(input);
+		else if(f->getString() == "GREATER")
+			return PrimitiveFunctions::GREATER(input);
+		else if(f->getString() == "EQ")
+			return PrimitiveFunctions::EQ(input->getLeft());
 		else 
 		{	// User defined functions
 			sExpression * fPtr = getFromDList(f);

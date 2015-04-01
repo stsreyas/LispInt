@@ -14,6 +14,24 @@ userDefines::~userDefines()
 		_defs.clear();
 }
 
+sExpression * userDefines::returnExisting(string name)
+{
+	std::vector<sExpression *>::size_type iter;
+	std::transform(name.begin(), name.end(), name.begin(), ::toupper); 
+	//check primitives
+	for(iter = 0; iter != _defs.size(); iter++)
+	{
+		string str = _defs.at(iter)->getString();
+		std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+		if(str == name)
+		{
+			cout<<"\nReturning existing "<<name<<endl;
+			return _defs.at(iter);
+		}
+	}
+	return NULL;
+}
+
 sExpression * userDefines::returnObject(string name)
 {
 	std::vector<sExpression *>::size_type iter;

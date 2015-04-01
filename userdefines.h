@@ -11,6 +11,7 @@ public:
 	~userDefines();
 
 	sExpression * returnObject(string name);
+	sExpression * returnExisting(string name);
 private:
 
 	std::vector<sExpression *> _defs;
