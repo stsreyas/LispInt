@@ -63,6 +63,7 @@ void sExpression::setValue(int val)
 {
 	this->type = ATOMIC_NUMERIC;
 	this->val = val;
+	this->s = std::to_string(val);
 } 
 
 sExpression * sExpression::getLeft()

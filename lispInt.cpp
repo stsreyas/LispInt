@@ -5,7 +5,6 @@
 int main()
 {
 	userDefines def;
-	userDefines def;
 	Parser *p = new Parser(&def);
 	string expression;	
 	bool keepRunning = true;

@@ -194,8 +194,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				}
 				std::string::size_type sz;
 				int val = std::stoi(atomic, &sz);
-				child->setString(atomic);
-				child->setValue(val);//If setString happens after setValue there is going to be trouble. Need to fix!!	
+				child->setValue(val);	
 			}
 			else
 			{
