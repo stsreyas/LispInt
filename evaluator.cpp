@@ -13,14 +13,21 @@ Evaluator::~Evaluator()
 
 }
 
-
-sExpression * Evaluator::evaluate(sExpression * input)
+sExpression * Evaluator::eval(sExpression * input)
 {
-	cout<<"\n inside evaluate"<<endl;
+	aList a;
+	sExpression * ret = evaluate(input, a);
+	return ret;
+
+}
+sExpression * Evaluator::evaluate(sExpression * input, aList a)
+{
+//	cout<<"\n inside evaluate"<<endl;
 	sExpression * res1 = PrimitiveFunctions::ATOM(input);
 	if(res1->getString() == "T")
 	{	
-		cout<<"\n atom :" << input->getString()<<endl;
+		// check in a list else return as is
+//		cout<<"\n atom :" << input->getString()<<endl;
 		return input;
 	}
 	else
@@ -31,17 +38,26 @@ sExpression * Evaluator::evaluate(sExpression * input)
 			sExpression * res3 = input->getLeft();
 			if(res3->getString() == "QUOTE")
 			{
-				cout<<"\n quote: R -> L"<<endl;
+//				cout<<"\n quote: R -> L"<<endl;
 				return input->getRight()->getLeft();		
+			}
+			else if(res3->getString() == "COND")
+			{
+				return evCond(input->getRight(), a);
+			}
+			else if(res3->getString() == "DEFUN")
+			{
+				//add to dlist;
+				add2DList(input->getRight());
 			}
 			else
 			{
 				sExpression * f = input->getLeft();
-				cout<<"\n f: L"<<endl;
+//				cout<<"\n f: L"<<endl;
 				sExpression * inp = input->getRight();
-				cout<<"\n evInp: R"<<endl;
-				sExpression * evInp = evList(inp);
-				return apply(f, evInp);
+//				cout<<"\n evInp: R"<<endl;
+				sExpression * evInp = evList(inp, a);
+				return apply(f, evInp, a);
 			}
 		}
 		else
@@ -50,9 +66,40 @@ sExpression * Evaluator::evaluate(sExpression * input)
 	return PrimitiveFunctions::NIL;		
 }
 
-sExpression * Evaluator::apply(sExpression * f, sExpression * input)
+aList Evaluator::generateAList(sExpression * argList1, sExpression * argList2, aList inp)
 {
-	cout<<"\n inside apply"<<endl;
+	aList retList = inp;
+	traverseArgLists(argList1, argList2, &retList);	
+	return retList;
+}
+
+void Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
+{
+	if(l1->getRight() == NULL)
+	{
+		if(l2->getRight() == NULL)
+		{ // correct number of arguments
+			string p1 = l1->getLeft()->getString();
+			string p2 = l2->getLeft()->getString();
+			ret->_aList[p1] = p2;
+			cout<<endl<<p1<<"="<<p2<<endl;
+			return;
+		}
+		else
+		{ // num arguments mismatch 
+		}
+	}
+	
+	string p1 = l1->getLeft()->getString();
+	string p2 = l2->getLeft()->getString();
+	ret->_aList[p1] = p2;
+	cout<<endl<<p1<<"="<<p2<<endl;
+	traverseArgLists(l1->getRight(), l2->getRight(), ret);
+}
+
+sExpression * Evaluator::apply(sExpression * f, sExpression * input, aList a)
+{
+//	cout<<"\n inside apply"<<endl;
 	if(PrimitiveFunctions::ATOM(f)->getString() == "T")
 	{
 		if(f->getString() == "CAR")
@@ -66,75 +113,80 @@ sExpression * Evaluator::apply(sExpression * f, sExpression * input)
 			return PrimitiveFunctions::ATOM(input->getLeft());
 		else if(f->getString() == "NULL")
 			return PrimitiveFunctions::ISNULL(input->getLeft());
-		else
-			return PrimitiveFunctions::NIL;
+		else 
+		{	// User defined functions
+			sExpression * fPtr = getFromDList(f);
+			// generate a-list here using car of fPtr and input (args)
+			aList a1;
+			generateAList(fPtr->getLeft(), input, a1);	
+			sExpression * ret = evaluate(fPtr->getRight(), a);
+		}
 	}
-	return PrimitiveFunctions::NIL;
-	
-	#if 0
-	else if((res3->getString() == "CAR") || (res3->getString() == "CDR") 
-		|| (res3->getString() == "ATOM") || (res3->getString() == "INT")
-		|| (res3->getString() == "NULL") || (res3->getString() == "CONS")
-	        || (res3->getString() == "PLUS") 
-		|| (res3->getString() == "MINUS") || (res3->getString() == "TIMES")
-		|| (res3->getString() == "QUOTIENT") || (res3->getString() == "REMAINDER")
-		|| (res3->getString() == "LESS") || (res3->getString() == "GREATER"))
+	return PrimitiveFunctions::NIL; // this is an error case
+}
+
+
+sExpression * Evaluator::evCond(sExpression * input, aList a)
+{
+	sExpression * res1 = PrimitiveFunctions::ISNULL(input);
+	if(res1->getString() == "T")
+		return PrimitiveFunctions::NIL; //this is an error case
+	else
 	{
-		sExpression * par1 = evaluate(input->getRight()->getLeft());
-		if(res3->getString() == "CAR")
-			return PrimitiveFunctions::CAR(par1);
-		else if(res3->getString() == "CDR")
-			return PrimitiveFunctions::CDR(par1);
-		else if(res3->getString() == "ATOM")
-			return PrimitiveFunctions::ATOM(par1);
-		else if(res3->getString() == "INT")
-			return PrimitiveFunctions::INT(par1);
-		else if(res3->getString() == "NULL")
-			return PrimitiveFunctions::ISNULL(par1);
-		else if(res3->getString() == "PLUS")
-			return PrimitiveFunctions::PLUS(par1);
-		else if(res3->getString() == "MINUS")
-			return PrimitiveFunctions::MINUS(par1);
-		else if(res3->getString() == "TIMES")
-			return PrimitiveFunctions::TIMES(par1);
-		else if(res3->getString() == "CONS")
-			return PrimitiveFunctions::CONS(par1);
-		else if(res3->getString() == "QUOTIENT")
-			return PrimitiveFunctions::QUOTIENT(par1);
-		else if(res3->getString() == "REMAINDER")
-			return PrimitiveFunctions::REMAINDER(par1);
-		else if(res3->getString() == "LESS")
-			return PrimitiveFunctions::LESS(par1);
-		else if(res3->getString() == "GREATER")
-			return PrimitiveFunctions::GREATER(par1);
+		sExpression * caar = input->getLeft()->getLeft();	
+		sExpression * bi = evaluate(caar, a);
+		if(bi->getString() == "T")
+		{
+			sExpression * cadar = input->getLeft()->getRight()->getLeft();
+			sExpression * ei = evaluate(cadar, a);
+		}
+		else
+		{
+			evCond(input->getRight(), a);
+		}
 	}
-	#endif
 }
 
 
-sExpression * Evaluator::evCond(sExpression * input)
+sExpression * Evaluator::evList(sExpression * input, aList a)
 {
-
-
-}
-
-
-sExpression * Evaluator::evList(sExpression * input)
-{
-	cout<<"\n inside evlist"<<endl;
+//	cout<<"\n inside evlist"<<endl;
 	sExpression * res1 = PrimitiveFunctions::ISNULL(input);
 	if(res1->getString() == "T")
 	{
-		cout<<"\n atom:"<<input->getString()<<endl;
+//		cout<<"\n atom:"<<input->getString()<<endl;
 		return PrimitiveFunctions::NIL;
 	}
 	else
 	{
-		cout<<"\n par1: L"<<endl;
-		sExpression * par1 = evaluate(input->getLeft());
-		cout<<"\n par2: R"<<endl;
-		sExpression * par2 = evList(input->getRight());
+//		cout<<"\n par1: L"<<endl;
+		sExpression * par1 = evaluate(input->getLeft(), a);
+//		cout<<"\n par2: R"<<endl;
+		sExpression * par2 = evList(input->getRight(), a);
 		sExpression * ret = PrimitiveFunctions::CONS(par1, par2);
 		return ret;
 	}
+}
+
+sExpression * Evaluator::getFromDList(sExpression * input)
+{
+	
+        std::vector<sExpression *>::size_type iter;
+	string name = input->getString();
+        //check primitives
+        for(iter = 0; iter != _dList.size(); iter++)
+        {
+                string str = _dList.at(iter)->getLeft()->getString();
+                if(str == name)
+                {
+                        cout<<"\nDefinition Found: "<<name<<endl;
+                        return _dList.at(iter)->getRight();
+                }
+        }
+        return  PrimitiveFunctions::NIL;
+}
+
+void Evaluator::add2DList(sExpression * f)
+{
+	_dList.push_back(f);
 }

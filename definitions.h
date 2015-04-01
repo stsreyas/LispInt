@@ -8,7 +8,7 @@ using namespace std;
 #include <string>
 #include <locale>
 #include <algorithm>
-
+#include <map>
 static string TOKENCODE[7] = {"Numeric", "Alphabet", "Arithmetic Operator",
 				 "Opening Brace", "Pointer", "Whitespace", "Closing Brace"};
 
