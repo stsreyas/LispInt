@@ -5,11 +5,12 @@ Parser::Parser()
 	_inputEncoded = NULL;
 }
 
-Parser::Parser(userDefines * uPtr)
+Parser::Parser(userDefines * uPtr, Primitives * pPtr)
 {
 
 	_inputEncoded = NULL;
 	_userDefs = uPtr;
+	_primitives = pPtr;
 }
 
 Parser::~Parser()
@@ -101,6 +102,14 @@ ParamPacket Parser::evaluateExpression()
 	return output;
 }
 
+sExpression * Parser::returnExpression(string name)
+{
+	sExpression * obj = _primitives->returnObject(name);	
+	if (obj == NULL)
+		obj = _userDefs->returnObject(name);
+	return obj;
+}
+
 // This is a recursive function
 // It will take as input a string, check the first element and if it is an opening paren
 // then it will call itself on a smaller string starting from the next element
@@ -167,8 +176,8 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				output._isList = true;
 			if((output._isList == true))
 			{
-				sExpression * child = parent->initLeaf();
-				child->setString("NIL");
+				sExpression * child = returnExpression("NIL");
+				parent->initLeaf(child);
 			}
 			output._strPtr = ++strPtr;
 			return output;			
@@ -201,7 +210,7 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				string atomic;
 				while(_inputEncoded[strPtr] <= 1)
 					atomic += inputString[strPtr++];
-				sExpression * child = _userDefs->returnObject(atomic);
+				sExpression * child = returnExpression(atomic);
 				parent->initLeaf(child);
 			}
 		}

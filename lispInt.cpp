@@ -1,11 +1,13 @@
 #include "definitions.h"
 #include "parser.h"
 #include "userdefines.h"
+#include "primitives.h"
 
 int main()
 {
 	userDefines def;
-	Parser *p = new Parser(&def);
+	Primitives prim;
+	Parser *p = new Parser(&def, &prim);
 	string expression;	
 	bool keepRunning = true;
 	while(keepRunning)

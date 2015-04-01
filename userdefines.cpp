@@ -25,6 +25,7 @@ sExpression * userDefines::returnObject(string name)
 		std::transform(str.begin(), str.end(),str.begin(), ::toupper);
 		if(str == name)
 		{
+			cout<<"\nReturning existing "<<name<<endl;
 			return _defs.at(iter);
 		}
 	}
