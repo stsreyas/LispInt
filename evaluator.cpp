@@ -187,10 +187,11 @@ sExpression * Evaluator::evCond(sExpression * input, aList a)
 		{
 			sExpression * cadar = input->getLeft()->getRight()->getLeft();
 			sExpression * ei = evaluate(cadar, a);
+			return ei;
 		}
 		else
 		{
-			evCond(input->getRight(), a);
+			return evCond(input->getRight(), a);
 		}
 	}
 }
