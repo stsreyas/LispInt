@@ -9,7 +9,7 @@ int main()
 	userDefines def;
 	Primitives prim;
 	Parser *p = new Parser(&def, &prim);
-	Evaluator eval;
+	Evaluator* eval = new Evaluator(&def);
 	
 	string expression;	
 	bool keepRunning = true;
@@ -24,7 +24,7 @@ int main()
 			output = p->Parse(input);
 			cout<<"\n>>"<<output<<endl;
 			sExpression * parsed = p->getParsedExpression();
-			sExpression * evaled = eval.eval(parsed);
+			sExpression * evaled = eval->eval(parsed);
 			p->traverseAndGenerate(evaled);
 			string evString = p->getOutputString();
 			cout<<"\n>>"<<evString<<endl;

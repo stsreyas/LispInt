@@ -4,6 +4,7 @@
 #include "definitions.h"
 #include "expressions.h"
 #include "primitivefunctions.h"
+#include "userdefines.h"
 
 using namespace PrimitiveFunctions;
 
@@ -12,6 +13,15 @@ class aList
 public:
 	aList(){};
 	~aList(){};
+	bool findElem(string name)
+	{
+		std::map<string, string>::iterator it;
+		it = _aList.find(name);
+		if(it != _aList.end())
+			return true;
+		else
+			return false;
+	};
 	std::map<string, string> _aList;
 };
 
@@ -20,6 +30,7 @@ class Evaluator
 {
 public:
 	Evaluator();
+	Evaluator(userDefines * defs);
 	~Evaluator();
 	sExpression * eval(sExpression * input);
 
@@ -35,6 +46,8 @@ private:
 	sExpression * getFromDList(sExpression * input);
 	std::vector<sExpression *> _dList;
 	void traverseArgLists(sExpression * l1, sExpression * l2, aList * ret);
-};
+	sExpression * returnExpression(string name);
+	userDefines *_userDefs;
+};	
 
 #endif
