@@ -41,7 +41,6 @@ private:
 	sExpression * evList(sExpression * input, aList a);
 	sExpression * apply(sExpression * f, sExpression * input, aList a);
 	void add2DList(sExpression * f);
-	//void add2AList(sExpression * p1, sExpression * c1
 	aList generateAList(sExpression * argList1, sExpression * argList2, aList inp);	
 	sExpression * getFromDList(sExpression * input);
 	std::vector<sExpression *> _dList;

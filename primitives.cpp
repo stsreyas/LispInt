@@ -58,7 +58,6 @@ sExpression * Primitives::returnObject(string name)
                 std::transform(str.begin(), str.end(),str.begin(), ::toupper);
                 if(str == name)
                 {
-			cout<<"\nReturned primitive "<<name<<endl;
                         return _list.at(iter);
                 }
         }

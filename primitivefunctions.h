@@ -22,12 +22,8 @@ namespace PrimitiveFunctions
         sExpression * LESS(sExpression * input);
         sExpression * GREATER(sExpression * input);
         sExpression * QUOTE(sExpression * input);
-	#if 0
-        sExpression * COND(sExpression * input);
-        sExpression * DEFUN(sExpression * input);
-	#endif
-	extern sExpression * T; //= new sExpression("T");
-	extern sExpression * NIL; //= new sExpression("NIL");
+	extern sExpression * T;
+	extern sExpression * NIL;
 };
 
 #endif
