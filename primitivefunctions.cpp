@@ -36,10 +36,40 @@ sExpression * PrimitiveFunctions::ATOM(sExpression * input)
 		return PrimitiveFunctions::NIL;
 }
 
+sExpression * PrimitiveFunctions::nEq(sExpression * e1, sExpression * e2)
+{	
+	if((PrimitiveFunctions::INT(e1)->getString() == "T"))
+	{ 
+		if(PrimitiveFunctions::INT(e2)->getString() == "T")
+		{
+			if(e1->getValue() == e2->getValue())
+				return PrimitiveFunctions::T;
+		}
+	}
+	else
+	{
+		if(PrimitiveFunctions::INT(e2)->getString() == "NIL")
+		{
+			if(e1->getString() == e2->getString())
+				return PrimitiveFunctions::T;
+		
+		}
+	}
+	return PrimitiveFunctions::NIL;
+}
+
 sExpression * PrimitiveFunctions::EQ(sExpression * e1, sExpression * e2)
 {
 	cout<<"\nInside eq\n";
-	
+	if(PrimitiveFunctions::ATOM(e1)->getString() == "T")
+	{
+		if(PrimitiveFunctions::ATOM(e2)->getString() == "T")
+			return nEq(e1, e2);
+	}
+	else if(EQ(e1->getLeft(), e2->getLeft())->getString() == "T")
+	{
+		return(EQ(e1->getRight(), e2->getRight()));
+	}
 	return PrimitiveFunctions::NIL;
 }
 

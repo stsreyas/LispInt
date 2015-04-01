@@ -10,7 +10,8 @@ namespace PrimitiveFunctions
         sExpression * CDR(sExpression * input);
         sExpression * CONS(sExpression * e1, sExpression * e2);
         sExpression * ATOM(sExpression * input);
-        sExpression * EQ(sExpression * e1, sExpression * e2);
+        sExpression * nEq(sExpression * e1, sExpression * e2);
+	sExpression * EQ(sExpression * e1, sExpression * e2);
         sExpression * ISNULL(sExpression * input);
         sExpression * INT(sExpression * input);
         sExpression * PLUS(sExpression * input);

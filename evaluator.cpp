@@ -158,7 +158,7 @@ sExpression * Evaluator::apply(sExpression * f, sExpression * input, aList a)
 		else if(f->getString() == "GREATER")
 			return PrimitiveFunctions::GREATER(input);
 		else if(f->getString() == "EQ")
-			return PrimitiveFunctions::EQ(input->getLeft());
+			return PrimitiveFunctions::EQ(input->getLeft(), input->getRight()->getLeft());
 		else 
 		{	// User defined functions
 			sExpression * fPtr = getFromDList(f);
