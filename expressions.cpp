@@ -15,6 +15,14 @@ sExpression::sExpression(string s)
 	this->s = s;
 }
 
+sExpression::sExpression(int val)
+{
+	sExpression();
+	this->type = ATOMIC_NUMERIC;
+	this->val = val;
+	this->s = std::to_string(val);
+}
+
 sExpression::~sExpression()
 {
 	if(this->left != NULL)
@@ -65,6 +73,11 @@ void sExpression::setValue(int val)
 	this->val = val;
 	this->s = std::to_string(val);
 } 
+
+int sExpression::getValue()
+{
+	return this->val;
+}
 
 sExpression * sExpression::getLeft()
 {

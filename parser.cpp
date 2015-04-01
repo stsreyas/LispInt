@@ -102,6 +102,17 @@ ParamPacket Parser::evaluateExpression()
 	return output;
 }
 
+sExpression * Parser::getParsedExpression()
+{
+	outputString = "";
+	return expTree;
+}
+
+string Parser::getOutputString()
+{
+	return outputString;
+}
+
 sExpression * Parser::returnExpression(string name)
 {
 	sExpression * obj = _primitives->returnObject(name);	

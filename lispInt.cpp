@@ -2,12 +2,15 @@
 #include "parser.h"
 #include "userdefines.h"
 #include "primitives.h"
+#include "evaluator.h"
 
 int main()
 {
 	userDefines def;
 	Primitives prim;
 	Parser *p = new Parser(&def, &prim);
+	Evaluator eval;
+
 	string expression;	
 	bool keepRunning = true;
 	while(keepRunning)
@@ -20,6 +23,11 @@ int main()
 		{
 			output = p->Parse(input);
 			cout<<"\n>>"<<output<<endl;
+			sExpression * parsed = p->getParsedExpression();
+			sExpression * evaled = eval.evaluate(parsed);
+			p->traverseAndGenerate(evaled);
+			string evString = p->getOutputString();
+			cout<<"\n>>"<<evString<<endl;
 		}
 		else
 			keepRunning = false;

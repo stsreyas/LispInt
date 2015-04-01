@@ -38,12 +38,14 @@ public:
 	~Parser();
 	
 	string Parse(string expression);
+	sExpression * getParsedExpression();
+	void traverseAndGenerate(sExpression * parent);
+	string getOutputString();
 private:
 
 	string inputString, outputString;
 	int * _inputEncoded;
 	void generateExpression();
-	void traverseAndGenerate(sExpression * parent);
 	int checkToken(char ch);
 	bool encodeString(string input);
 	ParamPacket evaluateExpression();
