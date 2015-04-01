@@ -6,6 +6,8 @@ using namespace std;
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <locale>
+#include <algorithm>
 
 static string TOKENCODE[7] = {"Numeric", "Alphabet", "Arithmetic Operator",
 				 "Opening Brace", "Pointer", "Whitespace", "Closing Brace"};

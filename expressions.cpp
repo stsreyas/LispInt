@@ -8,6 +8,13 @@ sExpression::sExpression()
 	type = UNKNOWN;
 }
 
+sExpression::sExpression(string s)
+{
+	sExpression();
+	this->type = ATOMIC_SYMBOLIC;
+	this->s = s;
+}
+
 sExpression::~sExpression()
 {
 	if(this->left != NULL)
@@ -32,6 +39,20 @@ sExpression * sExpression::initLeaf()
 	return NULL;
 }
 
+void sExpression::initLeaf(sExpression * child)
+{
+	this->type = NON_ATOMIC;
+	if(this->left == NULL)
+	{
+		this->left = child;
+		return;
+	}
+	else if(this->right == NULL)
+	{
+		this->right = child;
+		return;
+	}
+}
 void sExpression::setString(string s)
 {
 	this->type = ATOMIC_SYMBOLIC;

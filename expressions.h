@@ -64,7 +64,9 @@ class sExpression
 {
 public:
 	sExpression();
+	sExpression(string s);
 	~sExpression();
+	void initLeaf(sExpression * child);
 	sExpression * initLeaf();
 	void setString(string s);
 	void setValue(int val);

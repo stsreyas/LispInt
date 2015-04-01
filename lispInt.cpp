@@ -1,10 +1,12 @@
 #include "definitions.h"
 #include "parser.h"
-
+#include "userdefines.h"
 
 int main()
 {
-	Parser p;
+	userDefines def;
+	userDefines def;
+	Parser *p = new Parser(&def);
 	string expression;	
 	bool keepRunning = true;
 	while(keepRunning)
@@ -15,7 +17,7 @@ int main()
 		getline(cin, input, '$');
 		if(input.length() > 0)
 		{
-			output = p.Parse(input);
+			output = p->Parse(input);
 			cout<<"\n>>"<<output<<endl;
 		}
 		else

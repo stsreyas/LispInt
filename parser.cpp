@@ -5,6 +5,13 @@ Parser::Parser()
 	_inputEncoded = NULL;
 }
 
+Parser::Parser(userDefines * uPtr)
+{
+
+	_inputEncoded = NULL;
+	_userDefs = uPtr;
+}
+
 Parser::~Parser()
 {
 
@@ -169,9 +176,9 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 		else
 		{	// create a new atomic sExpression
 			numExpressions++;
-			sExpression * child = parent->initLeaf();
 			if(curCode == 0 || curCode == 2)
 			{	// numeric sExpression
+				sExpression * child = parent->initLeaf();
 				string atomic;
 				while(_inputEncoded[strPtr] <= 2)
 				{
@@ -195,7 +202,8 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 				string atomic;
 				while(_inputEncoded[strPtr] <= 1)
 					atomic += inputString[strPtr++];
-				child->setString(atomic);
+				sExpression * child = _userDefs->returnObject(atomic);
+				parent->initLeaf(child);
 			}
 		}
 		if(strPtr >= inputString.length())

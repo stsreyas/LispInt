@@ -3,6 +3,7 @@
 
 #include "definitions.h"
 #include "expressions.h"
+#include "userdefines.h"
 
 #define LOG
 
@@ -32,6 +33,7 @@ class Parser
 {
 public:
 	Parser();
+	Parser(userDefines * uPtr);
 	~Parser();
 	
 	string Parse(string expression);
@@ -49,6 +51,7 @@ private:
 	string pruneString(string expression);
 	string pruneCharacters(string input, string str2Find, string strReplace);
 	sExpression * expTree;
+	userDefines * _userDefs;
 };
 
 #endif
