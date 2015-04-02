@@ -4,18 +4,23 @@ using namespace PrimitiveFunctions;
 
 sExpression * PrimitiveFunctions::T = new sExpression("T");
 sExpression * PrimitiveFunctions::NIL = new sExpression("NIL");
+sExpression * PrimitiveFunctions::ERR = new sExpression("**Error**");
 
 sExpression * PrimitiveFunctions::CAR(sExpression * input)
 {
 	if(PrimitiveFunctions::ATOM(input)->getString() == "T")
 	{
-		//error!! might crash after this
+		cout<<"\nError: Input to CAR is ATOMIC\n";
 	}
 	return input->getLeft();
 }
 
 sExpression * PrimitiveFunctions::CDR(sExpression * input)
 {
+	if(PrimitiveFunctions::ATOM(input)->getString() == "T")
+	{
+		cout<<"\nError: Input to CDR is ATOMIC\n";
+	}
 	return input->getRight();
 }
 

@@ -11,7 +11,7 @@ using namespace PrimitiveFunctions;
 class aList
 {
 public:
-	aList(){};
+	aList(){errCode = 0;};
 	~aList(){};
 	bool findElem(string name)
 	{
@@ -23,6 +23,7 @@ public:
 			return false;
 	};
 	std::map<string, string> _aList;
+	int errCode;
 };
 
 
@@ -44,7 +45,7 @@ private:
 	aList generateAList(sExpression * argList1, sExpression * argList2, aList inp);	
 	sExpression * getFromDList(sExpression * input);
 	std::vector<sExpression *> _dList;
-	void traverseArgLists(sExpression * l1, sExpression * l2, aList * ret);
+	bool traverseArgLists(sExpression * l1, sExpression * l2, aList * ret);
 	sExpression * returnExpression(string name);
 	userDefines *_userDefs;
 };	

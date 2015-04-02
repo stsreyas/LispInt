@@ -78,23 +78,32 @@ sExpression * Evaluator::evaluate(sExpression * input, aList a)
 				sExpression * f = input->getLeft();
 				sExpression * inp = input->getRight();
 				sExpression * evInp = evList(inp, a);
+				if(evInp->getString() == "**Error**")
+					return evInp;
 				return apply(f, evInp, a);
 			}
 		}
 		else
-			return PrimitiveFunctions::NIL;
+		{
+			cout<<"\nError: Improper statement 1\n";	
+			return PrimitiveFunctions::ERR;
+		}
 	}
-	return PrimitiveFunctions::NIL;		
+//	cout<<"\nError: Improper statement 2\n";	
+	return PrimitiveFunctions::NIL;
 }
 
 aList Evaluator::generateAList(sExpression * argList1, sExpression * argList2, aList inp)
 {
 	aList retList = inp;
-	traverseArgLists(argList1, argList2, &retList);	
+	bool status = traverseArgLists(argList1, argList2, &retList);	
+	if(!status)
+		retList.errCode = 1;
+
 	return retList;
 }
 
-void Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
+bool Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
 {
 	if(PrimitiveFunctions::ISNULL(l1->getRight())->getString() == "T")
 	{
@@ -103,18 +112,27 @@ void Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
 			string p1 = l1->getLeft()->getString();
 			string p2 = l2->getLeft()->getString();
 			ret->_aList[p1] = p2;
-			return;
+			return true;
 		}
 		else
 		{ // num arguments mismatch 
-			cout<<endl<<"Argument mismatch\n";
+			cout<<"\nError: Too many arguments\n";
+			return false;
 		}
+	}
+	else if(PrimitiveFunctions::ISNULL(l2->getRight())->getString() == "T")
+	{
+		
+		cout<<"\nError: Too few arguments\n";
+		return false;
 	}
 	
 	string p1 = l1->getLeft()->getString();
 	string p2 = l2->getLeft()->getString();
 	ret->_aList[p1] = p2;
-	traverseArgLists(l1->getRight(), l2->getRight(), ret);
+	bool status = traverseArgLists(l1->getRight(), l2->getRight(), ret);
+	return status;
+	
 }
 
 sExpression * Evaluator::apply(sExpression * f, sExpression * input, aList a)
@@ -153,15 +171,25 @@ sExpression * Evaluator::apply(sExpression * f, sExpression * input, aList a)
 		else 
 		{	// User defined functions
 			sExpression * fPtr = getFromDList(f);
+			if(fPtr == NULL)
+			{
+				cout<<"\nError: Undefined function name\n";
+				return PrimitiveFunctions::ERR;
+			}
 			// check for undefined functions
 			// generate a-list here using car of fPtr and input (args)
 			aList a1;
 			a1 = generateAList(fPtr->getLeft(), input, a1);
+			if((a1.errCode) == 1)
+				return PrimitiveFunctions::ERR;
 			sExpression * ret = evaluate(fPtr->getRight()->getLeft(), a1);
 			return ret;
 		}
 	}
-	return PrimitiveFunctions::NIL; // this is an error case
+	
+	cout<<"\nError: Improper Statement 3\n";
+	return PrimitiveFunctions::ERR;
+//	return PrimitiveFunctions::NIL; // this is an error case
 }
 
 
@@ -169,7 +197,10 @@ sExpression * Evaluator::evCond(sExpression * input, aList a)
 {
 	sExpression * res1 = PrimitiveFunctions::ISNULL(input);
 	if(res1->getString() == "T")
-		return PrimitiveFunctions::NIL; //this is an error case
+	{
+		cout<<"\nError: Improper conditional\n";
+		return PrimitiveFunctions::ERR; //this is an error case
+	}
 	else
 	{
 		sExpression * caar = input->getLeft()->getLeft();	
@@ -193,12 +224,17 @@ sExpression * Evaluator::evList(sExpression * input, aList a)
 	sExpression * res1 = PrimitiveFunctions::ISNULL(input);
 	if(res1->getString() == "T")
 	{// this is an error case
+	//	cout<<"\nError: Irregular List Structure\n";
 		return PrimitiveFunctions::NIL;
 	}
 	else
 	{
 		sExpression * par1 = evaluate(input->getLeft(), a);
+		if(par1->getString() == "**Error**")
+			return par1;
 		sExpression * par2 = evList(input->getRight(), a);
+		if(par2->getString() == "**Error**")
+			return par2;
 		sExpression * ret = PrimitiveFunctions::CONS(par1, par2);
 		return ret;
 	}

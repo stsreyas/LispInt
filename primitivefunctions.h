@@ -24,6 +24,7 @@ namespace PrimitiveFunctions
         sExpression * QUOTE(sExpression * input);
 	extern sExpression * T;
 	extern sExpression * NIL;
+	extern sExpression * ERR;
 };
 
 #endif
