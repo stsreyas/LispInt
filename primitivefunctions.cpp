@@ -7,6 +7,10 @@ sExpression * PrimitiveFunctions::NIL = new sExpression("NIL");
 
 sExpression * PrimitiveFunctions::CAR(sExpression * input)
 {
+	if(PrimitiveFunctions::ATOM(input)->getString() == "T")
+	{
+		//error!! might crash after this
+	}
 	return input->getLeft();
 }
 

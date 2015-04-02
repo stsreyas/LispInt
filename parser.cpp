@@ -83,14 +83,16 @@ ParamPacket Parser::evaluateExpression()
 {
 	ParamPacket output;
 	expTree = new sExpression;
-	if(_inputEncoded[0] == 3)
+	if(_inputEncoded[0] == 3) 
 	{
 		output = evaluate(1, expTree, false);
+		#if 1 
 		if((output._errorCode == 0) && (output._strPtr < inputString.length()))
 		{
 			output._errorCode = 1;
 			output._errorMessage += "Improper termination";
 		}
+		#endif
 	}
 	else
 	{	if(inputString.length() >= 1)
@@ -226,10 +228,13 @@ ParamPacket Parser::evaluate(int strPtr, sExpression * parent, bool listFlag)
 			}
 		}
 		if(strPtr >= inputString.length())
-		{
+		{ 
 			keepRunning = false;
-			output._errorCode = 1;
-			output._errorMessage += "Closing Paren Not Found";
+//			if((output._isList || output._pointerSeen))
+//			{
+				output._errorCode = 1;
+				output._errorMessage += "Closing Paren Not Found";
+//			}
 			return output;
 		}
 	}
@@ -293,24 +298,28 @@ int Parser::checkToken(char ch)
 // This function removes extra whitespaces and returns from the input string
 string Parser::pruneString(string expression)
 {
-	string ret = "\n";
-	string pruned;
-	// prune return from string
-	int startFrom = 0;
-	int loc = 0;
-	while(loc != std::string::npos)
-	{
-	   	loc = expression.find(ret, startFrom);
-      		pruned += expression.substr(startFrom, (loc - startFrom));
-		startFrom = loc + 1;
-	}
-
+	string pruned = expression;	
+	pruned.erase(std::remove(pruned.begin(), pruned.end(), '\n'), pruned.end());
+	pruned.erase(std::remove(pruned.begin(), pruned.end(), '\t'), pruned.end());
+	
 	pruned = pruneCharacters(pruned, "  ", " ");
 	pruned = pruneCharacters(pruned, " .", ".");
 	pruned = pruneCharacters(pruned, ". ", ".");
 	pruned = pruneCharacters(pruned, "( ", "(");
 	pruned = pruneCharacters(pruned, " )", ")");
+	
+	int idx = 0;
+	int len = pruned.length();
+	while(pruned[idx] == ' ')
+		idx++;
 
+	pruned = pruned.substr(idx, len);
+
+	idx = pruned.length();
+	while(pruned[idx] == ' ')
+		idx--;
+	
+	pruned = pruned.substr(0,idx);
 	return pruned;
 }
 

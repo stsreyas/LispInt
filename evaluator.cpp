@@ -103,7 +103,6 @@ void Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
 			string p1 = l1->getLeft()->getString();
 			string p2 = l2->getLeft()->getString();
 			ret->_aList[p1] = p2;
-			cout<<endl<<p1<<"="<<ret->_aList[p1]<<endl;
 			return;
 		}
 		else
@@ -115,7 +114,6 @@ void Evaluator::traverseArgLists(sExpression * l1, sExpression *l2, aList * ret)
 	string p1 = l1->getLeft()->getString();
 	string p2 = l2->getLeft()->getString();
 	ret->_aList[p1] = p2;
-	cout<<endl<<p1<<"="<<ret->_aList[p1]<<endl;
 	traverseArgLists(l1->getRight(), l2->getRight(), ret);
 }
 
